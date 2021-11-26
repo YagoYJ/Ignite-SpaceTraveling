@@ -2,6 +2,7 @@ import { GetStaticPaths, GetStaticProps } from "next";
 import Head from "next/head";
 import { AiOutlineCalendar, AiOutlineClockCircle } from "react-icons/ai";
 import { FiUser } from "react-icons/fi";
+import Header from "../../components/Header";
 
 import { getPrismicClient } from "../../services/prismic";
 
@@ -36,9 +37,7 @@ export default function Post(): JSX.Element {
         <title>Post | Space Traveling</title>
       </Head>
 
-      <header className={styles.header}>
-        <img src="/images/logo.svg" alt="logo" />
-      </header>
+      <Header />
 
       <div className={styles.banner}>
         <img src="/images/Lorem.jpg" alt="banner" />
