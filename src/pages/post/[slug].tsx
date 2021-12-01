@@ -1,17 +1,20 @@
+import { Fragment } from "react";
 import { GetStaticPaths, GetStaticProps } from "next";
 import Head from "next/head";
+import { useRouter } from "next/router";
+import Prismic from "@prismicio/client";
 import { RichText } from "prismic-dom";
 import { AiOutlineCalendar, AiOutlineClockCircle } from "react-icons/ai";
 import { FiUser } from "react-icons/fi";
-import Prismic from "@prismicio/client";
-import { useRouter } from "next/router";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { Fragment } from "react";
+import { Utterances } from "utterances-react-component";
+
 import Header from "../../components/Header";
 
 import { getPrismicClient } from "../../services/prismic";
 
+import commonStyles from "../../styles/common.module.scss";
 import styles from "./post.module.scss";
 
 interface Post {
@@ -68,8 +71,8 @@ export default function Post({ post }: PostProps): JSX.Element {
         <img src={post.data.banner.url} alt="banner" />
       </div>
 
-      <main className={styles.main}>
-        <article>
+      <main className={commonStyles.container}>
+        <article className={styles.post}>
           <h1>{post.data.title}</h1>
           <div className={styles.details}>
             <div>
@@ -93,7 +96,6 @@ export default function Post({ post }: PostProps): JSX.Element {
           </div>
 
           <div className={styles.content}>
-            <h2>{post.data.subtitle}</h2>
             {post.data.content.map(content => (
               <Fragment key={content.heading}>
                 <h3>{content.heading}</h3>
@@ -109,6 +111,14 @@ export default function Post({ post }: PostProps): JSX.Element {
           </div>
         </article>
       </main>
+      <footer className={`${commonStyles.container} ${styles.footer}`}>
+        <Utterances
+          label="Space Traveling comment"
+          repo="YagoYJ/Ignite-SpaceTraveling"
+          theme="github-dark"
+          issueTerm="pathname"
+        />
+      </footer>
     </>
   );
 }
