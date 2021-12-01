@@ -73,48 +73,50 @@ export default function Home({ postsPagination }: HomeProps): JSX.Element {
       </Head>
 
       <Header />
-      <main className={styles.content}>
-        <div className={styles.posts}>
-          {posts.results.map(post => (
-            <Link href={`/post/${post.uid}`} key={post.uid}>
-              <a>
-                <h2>{post.data.title}</h2>
-                <p>{post.data.subtitle}</p>
+      <div className={commonStyles.container}>
+        <main className={styles.content}>
+          <div className={styles.posts}>
+            {posts.results.map(post => (
+              <Link href={`/post/${post.uid}`} key={post.uid}>
+                <a>
+                  <h2>{post.data.title}</h2>
+                  <p>{post.data.subtitle}</p>
 
-                <div className={styles.details}>
-                  <div>
-                    <AiOutlineCalendar size="1.3rem" />
-                    <time>
-                      {format(
-                        new Date(post.first_publication_date),
-                        "dd LLL yyyy",
-                        {
-                          locale: ptBR
-                        }
-                      )}
-                    </time>
+                  <div className={styles.details}>
+                    <div>
+                      <AiOutlineCalendar size="1.3rem" />
+                      <time>
+                        {format(
+                          new Date(post.first_publication_date),
+                          "dd LLL yyyy",
+                          {
+                            locale: ptBR
+                          }
+                        )}
+                      </time>
+                    </div>
+
+                    <div>
+                      <FiUser size="1.3rem" />
+                      <span>{post.data.author}</span>
+                    </div>
                   </div>
+                </a>
+              </Link>
+            ))}
+          </div>
 
-                  <div>
-                    <FiUser size="1.3rem" />
-                    <span>{post.data.author}</span>
-                  </div>
-                </div>
-              </a>
-            </Link>
-          ))}
-        </div>
-
-        {posts.next_page && (
-          <button
-            type="button"
-            className={styles.loadMorePostsButton}
-            onClick={() => handleFetchMorePost(posts.next_page)}
-          >
-            Carregar mais posts
-          </button>
-        )}
-      </main>
+          {posts.next_page && (
+            <button
+              type="button"
+              className={styles.loadMorePostsButton}
+              onClick={() => handleFetchMorePost(posts.next_page)}
+            >
+              Carregar mais posts
+            </button>
+          )}
+        </main>
+      </div>
     </>
   );
 }
