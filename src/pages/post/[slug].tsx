@@ -1,6 +1,7 @@
 import { Fragment } from "react";
 import { GetStaticPaths, GetStaticProps } from "next";
 import Head from "next/head";
+import Link from "next/link";
 import { useRouter } from "next/router";
 import Prismic from "@prismicio/client";
 import { RichText } from "prismic-dom";
@@ -38,9 +39,10 @@ interface Post {
 
 interface PostProps {
   post: Post;
+  preview: boolean;
 }
 
-export default function Post({ post }: PostProps): JSX.Element {
+export default function Post({ post, preview }: PostProps): JSX.Element {
   const router = useRouter();
 
   if (router.isFallback) {
@@ -79,7 +81,7 @@ export default function Post({ post }: PostProps): JSX.Element {
               <AiOutlineCalendar size="1.3rem" />
               <time>
                 {format(new Date(post.first_publication_date), "dd LLL yyyy", {
-                  locale: ptBR
+                  locale: ptBR,
                 })}
               </time>
             </div>
@@ -103,7 +105,7 @@ export default function Post({ post }: PostProps): JSX.Element {
                 <div
                   // eslint-disable-next-line react/no-danger
                   dangerouslySetInnerHTML={{
-                    __html: RichText.asHtml(content.body)
+                    __html: RichText.asHtml(content.body),
                   }}
                 />
               </Fragment>
@@ -111,6 +113,7 @@ export default function Post({ post }: PostProps): JSX.Element {
           </div>
         </article>
       </main>
+
       <footer className={`${commonStyles.container} ${styles.footer}`}>
         <Utterances
           label="Space Traveling comment"
@@ -118,6 +121,16 @@ export default function Post({ post }: PostProps): JSX.Element {
           theme="github-dark"
           issueTerm="pathname"
         />
+
+        {preview && (
+          <aside className={commonStyles.exitPreviewContainer}>
+            <Link href="/api/exit-preview">
+              <a className={commonStyles.exitPreviewButton}>
+                Sair do modo Preview
+              </a>
+            </Link>
+          </aside>
+        )}
       </footer>
     </>
   );
@@ -126,7 +139,7 @@ export default function Post({ post }: PostProps): JSX.Element {
 export const getStaticPaths: GetStaticPaths = async () => {
   const prismic = getPrismicClient();
   const posts = await prismic.query([
-    Prismic.predicates.at("document.type", "posts")
+    Prismic.predicates.at("document.type", "posts"),
   ]);
 
   const paths = posts.results.map(post => {
@@ -136,18 +149,21 @@ export const getStaticPaths: GetStaticPaths = async () => {
   return {
     paths: [
       {
-        params: { slug: paths[0] }
+        params: { slug: paths[0] },
       },
       {
-        params: { slug: paths[1] }
-      }
+        params: { slug: paths[1] },
+      },
     ],
-    fallback: true
+    fallback: true,
   };
 };
 
-export const getStaticProps: GetStaticProps = async context => {
-  const { slug } = context.params;
+export const getStaticProps: GetStaticProps = async ({
+  params,
+  preview = false,
+}) => {
+  const { slug } = params;
   const prismic = getPrismicClient();
   const response = await prismic.getByUID("posts", String(slug), {});
 
@@ -161,11 +177,11 @@ export const getStaticProps: GetStaticProps = async context => {
       author: response.data.author,
       content: response.data.content.map(content => {
         return { heading: content.heading, body: content.body };
-      })
-    }
+      }),
+    },
   };
   return {
-    props: { post },
-    revalidate: 60 * 2 // 2 minutes
+    props: { post, preview },
+    revalidate: 60 * 2, // 2 minutes
   };
 };

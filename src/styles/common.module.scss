@@ -3,3 +3,24 @@
   padding: 0 1.333rem;
   margin: 0 auto;
 }
+
+.exitPreviewContainer {
+  width: 100%;
+  background-color: var(--heading);
+  border-radius: 4px;
+  margin-top: 5.866rem;
+  transition: 0.2s;
+
+  & > a {
+    display: block;
+    width: 100%;
+    text-align: center;
+    padding: 1.2rem;
+    font-weight: bold;
+    font-size: 1.2rem;
+  }
+
+  &:hover {
+    filter: brightness(0.8);
+  }
+}
