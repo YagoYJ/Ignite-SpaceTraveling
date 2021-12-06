@@ -31,9 +31,13 @@ interface PostPagination {
 
 interface HomeProps {
   postsPagination: PostPagination;
+  preview: boolean;
 }
 
-export default function Home({ postsPagination }: HomeProps): JSX.Element {
+export default function Home({
+  postsPagination,
+  preview,
+}: HomeProps): JSX.Element {
   const [posts, setPosts] = useState<PostPagination>(postsPagination);
 
   function handleFetchMorePost(nextPage: string): void {
@@ -48,20 +52,20 @@ export default function Home({ postsPagination }: HomeProps): JSX.Element {
               new Date(post.first_publication_date),
               "dd LLL yyyy",
               {
-                locale: ptBR
+                locale: ptBR,
               }
             ),
             data: {
               title: post.data.title,
               subtitle: post.data.subtitle,
-              author: post.data.author
-            }
+              author: post.data.author,
+            },
           })
         );
 
         setPosts({
           next_page: data.next_page,
-          results: newPosts
+          results: newPosts,
         });
       });
   }
@@ -90,7 +94,7 @@ export default function Home({ postsPagination }: HomeProps): JSX.Element {
                           new Date(post.first_publication_date),
                           "dd LLL yyyy",
                           {
-                            locale: ptBR
+                            locale: ptBR,
                           }
                         )}
                       </time>
@@ -115,19 +119,33 @@ export default function Home({ postsPagination }: HomeProps): JSX.Element {
               Carregar mais posts
             </button>
           )}
+
+          {preview && (
+            <aside className={commonStyles.exitPreviewContainer}>
+              <Link href="/api/exit-preview">
+                <a className={commonStyles.exitPreviewButton}>
+                  Sair do modo Preview
+                </a>
+              </Link>
+            </aside>
+          )}
         </main>
       </div>
     </>
   );
 }
 
-export const getStaticProps: GetStaticProps = async () => {
+export const getStaticProps: GetStaticProps = async ({
+  preview = false,
+  previewData,
+}) => {
   const prismic = getPrismicClient();
   const postsResponse = await prismic.query(
     [Prismic.predicates.at("document.type", "posts")],
     {
       fetch: ["posts.title", "posts.subtitle", "posts.author"],
-      pageSize: 1
+      pageSize: 1,
+      ref: previewData?.ref ?? null,
     }
   );
 
@@ -140,15 +158,16 @@ export const getStaticProps: GetStaticProps = async () => {
         data: {
           title: post.data.title,
           subtitle: post.data.subtitle,
-          author: post.data.author
-        }
+          author: post.data.author,
+        },
       };
-    })
+    }),
   };
 
   return {
     props: {
-      postsPagination
-    }
+      postsPagination,
+      preview,
+    },
   };
 };
