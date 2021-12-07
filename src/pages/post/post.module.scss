@@ -23,7 +23,7 @@
     flex-direction: row;
     align-items: center;
     color: var(--info);
-    margin: 1.666rem 0 4.266rem;
+    margin: 1.666rem 0;
 
     div {
       display: flex;
@@ -39,6 +39,11 @@
         margin-left: 0.533rem;
       }
     }
+  }
+
+  .publicationDate {
+    color: var(--info);
+    margin-bottom: 4.266rem;
   }
 
   .content {
