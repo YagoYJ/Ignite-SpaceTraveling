@@ -77,4 +77,36 @@
 
 .footer {
   margin-bottom: 5rem;
+  padding: 3.2rem 0 0;
+  border-top: 1px solid var(--body);
+
+  .nextPostsContainer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 5.333rem;
+
+    div {
+      max-width: 250px;
+    }
+
+    div:last-child {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      text-align: right;
+    }
+
+    h2 {
+      color: var(--heading);
+      font-weight: 400;
+    }
+
+    a {
+      display: block;
+      margin-top: 0.533;
+      color: var(--highlight);
+      font-weight: 900;
+    }
+  }
 }
