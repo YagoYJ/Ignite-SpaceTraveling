@@ -40,9 +40,22 @@ interface Post {
 interface PostProps {
   post: Post;
   preview: boolean;
+  nextPost: {
+    uid: string;
+    title: string;
+  } | null;
+  prevPost: {
+    uid: string;
+    title: string;
+  } | null;
 }
 
-export default function Post({ post, preview }: PostProps): JSX.Element {
+export default function Post({
+  post,
+  preview,
+  nextPost,
+  prevPost,
+}: PostProps): JSX.Element {
   const router = useRouter();
 
   if (router.isFallback) {
@@ -115,6 +128,32 @@ export default function Post({ post, preview }: PostProps): JSX.Element {
       </main>
 
       <footer className={`${commonStyles.container} ${styles.footer}`}>
+        <div className={styles.nextPostsContainer}>
+          {prevPost ? (
+            <div>
+              <h2>{prevPost.title}</h2>
+
+              <Link href={`/post/${prevPost.uid}`}>
+                <a>Post anterior</a>
+              </Link>
+            </div>
+          ) : (
+            <div />
+          )}
+
+          {nextPost ? (
+            <div>
+              <h2>{nextPost.title}</h2>
+
+              <Link href={`/post/${nextPost.uid}`}>
+                <a>Próximo post</a>
+              </Link>
+            </div>
+          ) : (
+            <div />
+          )}
+        </div>
+
         <Utterances
           label="Space Traveling comment"
           repo="YagoYJ/Ignite-SpaceTraveling"
@@ -162,6 +201,7 @@ export const getStaticPaths: GetStaticPaths = async () => {
 export const getStaticProps: GetStaticProps = async ({
   params,
   preview = false,
+  previewData,
 }) => {
   const { slug } = params;
   const prismic = getPrismicClient();
@@ -180,8 +220,59 @@ export const getStaticProps: GetStaticProps = async ({
       }),
     },
   };
+
+  const nextPostReponse = await prismic.query(
+    [
+      Prismic.Predicates.at("document.type", "posts"),
+      Prismic.Predicates.dateAfter(
+        "document.first_publication_date",
+        response.first_publication_date
+      ),
+    ],
+    {
+      fetch: ["post.results.uid", "post.results.title"],
+      ref: previewData?.ref ?? null,
+    }
+  );
+
+  const prevPostReponse = await prismic.query(
+    [
+      Prismic.Predicates.at("document.type", "posts"),
+      Prismic.Predicates.dateBefore(
+        "document.first_publication_date",
+        response.first_publication_date
+      ),
+    ],
+    {
+      fetch: ["post.results.uid", "post.results.title"],
+      ref: previewData?.ref ?? null,
+    }
+  );
+
+  let prevPost = null;
+  let nextPost = null;
+
+  if (prevPostReponse.results.length > 0) {
+    prevPost = {
+      uid: prevPostReponse.results[0]?.uid,
+      title: prevPostReponse.results[0]?.data?.title,
+    };
+  }
+
+  if (nextPostReponse.results.length > 0) {
+    nextPost = {
+      uid: nextPostReponse.results[0]?.uid,
+      title: nextPostReponse.results[0]?.data?.title,
+    };
+  }
+
   return {
-    props: { post, preview },
+    props: {
+      post,
+      preview,
+      prevPost,
+      nextPost,
+    },
     revalidate: 60 * 2, // 2 minutes
   };
 };
